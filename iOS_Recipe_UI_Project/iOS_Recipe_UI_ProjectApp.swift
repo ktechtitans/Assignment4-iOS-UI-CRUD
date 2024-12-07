@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-@main
 struct iOS_Recipe_UI_ProjectApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RecipeListScreen()
         }
     }
 }
+

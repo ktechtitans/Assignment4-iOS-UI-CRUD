@@ -7,18 +7,17 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+@main
+struct RecipeApp: App {
+    var body: some Scene {
+        WindowGroup {
+            RecipeListScreen()
         }
-        .padding()
     }
 }
 
+
 #Preview {
-    ContentView()
+    RegisterScreen()
 }
+
