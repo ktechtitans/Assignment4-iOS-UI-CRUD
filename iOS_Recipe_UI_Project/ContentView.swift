@@ -8,20 +8,18 @@
 import SwiftUI
 
 struct RecipeApp: App {
-    @State private var isLoggedIn: Bool = false
-
     var body: some Scene {
         WindowGroup {
-            RegisterScreen(isLoggedIn: $isLoggedIn) 
+            RegisterScreen()
         }
     }
 }
 
 
+
 struct ContentView_Previews: PreviewProvider {
-    @State static var isLoggedIn: Bool = false
     static var previews: some View {
-        RegisterScreen(isLoggedIn: $isLoggedIn)
+        RegisterScreen()
     }
 }
 

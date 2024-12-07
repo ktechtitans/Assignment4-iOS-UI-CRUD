@@ -14,9 +14,6 @@ struct RecipeListScreen: View {
     @State private var errorMessage: String?
     @State private var userToken: String? = UserDefaults.standard.string(forKey: "authToken")
 
-    @State private var username: String = ""
-    @State private var password: String = ""
-
     var body: some View {
         NavigationView {
             VStack {
@@ -64,21 +61,6 @@ struct RecipeListScreen: View {
                         EmptyView()
                     }
                 )
-                
-                
-                VStack {
-                    TextField("Username", text: $username)
-                        .padding()
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    SecureField("Password", text: $password)
-                        .padding()
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    Button("Login") {
-                        loginUser()
-                    }
-                    .padding()
-                }
-                .padding()
             }
         }
     }
@@ -91,23 +73,6 @@ struct RecipeListScreen: View {
                     self.errorMessage = error
                 } else if let fetchedRecipes = fetchedRecipes {
                     self.recipes = fetchedRecipes
-                }
-            }
-        }
-    }
-
-    // Login User
-    private func loginUser() {
-        APIService.login(username: username, password: password) { success, error in
-            DispatchQueue.main.async {
-                if success {
-                    // User logged in successfully, fetch recipes
-                    if let token = UserDefaults.standard.string(forKey: "authToken") {
-                        userToken = token
-                        fetchRecipes(token: token)
-                    }
-                } else {
-                    self.errorMessage = error ?? "Login failed"
                 }
             }
         }
@@ -174,4 +139,3 @@ struct RecipeListScreen_Previews: PreviewProvider {
         RecipeListScreen()
     }
 }
-

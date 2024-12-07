@@ -14,7 +14,8 @@ struct RegisterScreen: View {
     @State private var password: String = ""
     @State private var registrationMessage: String = ""
     @State private var registrationSuccess: Bool = false
-    @Binding var isLoggedIn: Bool
+    
+    var onRegisterSuccess: (() -> Void)? // Closure to notify parent view
 
     var body: some View {
         NavigationView {
@@ -25,7 +26,6 @@ struct RegisterScreen: View {
                     .padding(.top, 20)
                     .padding(.bottom, 50)
 
-                
                 TextField("Username", text: $username)
                     .padding()
                     .border(Color.gray)
@@ -43,46 +43,37 @@ struct RegisterScreen: View {
                         .padding()
                         .background(Color.black)
                         .foregroundColor(.white)
-                        .cornerRadius(0)
+                        .cornerRadius(8)
                         .padding(.top, 50)
                 }
 
                 Text(registrationMessage)
                     .foregroundColor(.red)
                     .padding()
-
-                
-                NavigationLink(destination: LoginScreen(isLoggedIn: $isLoggedIn), isActive: $registrationSuccess) {
-                    EmptyView()
-                }
-
-              
-                NavigationLink(destination: LoginScreen(isLoggedIn: $isLoggedIn)) {
-                    Text("Already have an account? Login")
-                        .foregroundColor(.blue)
-                        .padding(.top, 20)
-                }
             }
             .padding()
         }
     }
-    
+
     func registerUser() {
-       
+        // Simulate API registration call
         APIService.register(username: username, email: email, password: password) { success, errorMessage in
-            if success {
-                registrationMessage = "Registration successful!"
-                registrationSuccess = true
-            } else {
-                registrationMessage = errorMessage ?? "An unknown error occurred."
+            DispatchQueue.main.async {
+                if success {
+                    registrationMessage = "Registration successful!"
+                    registrationSuccess = true
+                    onRegisterSuccess?() // Notify parent view of successful registration
+                } else {
+                    registrationMessage = errorMessage ?? "An unknown error occurred."
+                }
             }
         }
     }
 }
 
+
 struct RegisterScreen_Previews: PreviewProvider {
-    @State static var isLoggedIn: Bool = false
     static var previews: some View {
-        RegisterScreen(isLoggedIn: $isLoggedIn)
+        RegisterScreen()
     }
 }

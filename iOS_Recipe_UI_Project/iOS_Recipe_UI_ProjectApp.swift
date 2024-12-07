@@ -14,13 +14,16 @@ struct iOS_Recipe_UI_ProjectApp: App {
     var body: some Scene {
         WindowGroup {
             if isLoggedIn {
-                RecipeListScreen() 
+                RecipeListScreen()
             } else {
-                RegisterScreen(isLoggedIn: $isLoggedIn)
+                RegisterScreen(onRegisterSuccess: {
+                    isLoggedIn = true // Update the state when registration is successful
+                })
             }
         }
     }
 }
+
 
 
 
