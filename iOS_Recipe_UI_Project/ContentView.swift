@@ -7,17 +7,23 @@
 
 import SwiftUI
 
-@main
 struct RecipeApp: App {
+    @State private var isLoggedIn: Bool = false
+
     var body: some Scene {
         WindowGroup {
-            RecipeListScreen()
+            RegisterScreen(isLoggedIn: $isLoggedIn) 
         }
     }
 }
 
 
-#Preview {
-    RegisterScreen()
+struct ContentView_Previews: PreviewProvider {
+    @State static var isLoggedIn: Bool = false
+    static var previews: some View {
+        RegisterScreen(isLoggedIn: $isLoggedIn)
+    }
 }
+
+
 

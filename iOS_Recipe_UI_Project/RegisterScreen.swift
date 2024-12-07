@@ -5,24 +5,31 @@
 //  Created by Kanchan Kaur on 2024-12-06.
 //
 
+
 import SwiftUI
 
 struct RegisterScreen: View {
+    @State private var username: String = ""
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var registrationMessage: String = ""
-    @State private var registrationSuccess: Bool = false // State to track registration success
+    @State private var registrationSuccess: Bool = false
+    @Binding var isLoggedIn: Bool
 
     var body: some View {
         NavigationView {
             VStack {
-                    
                 Text("Create Account")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding(.top, 20)
                     .padding(.bottom, 50)
+
                 
+                TextField("Username", text: $username)
+                    .padding()
+                    .border(Color.gray)
+
                 TextField("Email", text: $email)
                     .padding()
                     .border(Color.gray)
@@ -44,13 +51,13 @@ struct RegisterScreen: View {
                     .foregroundColor(.red)
                     .padding()
 
-                // NavigationLink to go to LoginScreen after registration success
-                NavigationLink(destination: LoginScreen(), isActive: $registrationSuccess) {
-                    EmptyView() // EmptyView is used to perform navigation programmatically
+                
+                NavigationLink(destination: LoginScreen(isLoggedIn: $isLoggedIn), isActive: $registrationSuccess) {
+                    EmptyView()
                 }
 
-                // Already have an account? Login Button
-                NavigationLink(destination: LoginScreen()) {
+              
+                NavigationLink(destination: LoginScreen(isLoggedIn: $isLoggedIn)) {
                     Text("Already have an account? Login")
                         .foregroundColor(.blue)
                         .padding(.top, 20)
@@ -61,10 +68,11 @@ struct RegisterScreen: View {
     }
     
     func registerUser() {
-        APIService.register(email: email, password: password) { success, errorMessage in
+       
+        APIService.register(username: username, email: email, password: password) { success, errorMessage in
             if success {
                 registrationMessage = "Registration successful!"
-                registrationSuccess = true // Trigger navigation after successful registration
+                registrationSuccess = true
             } else {
                 registrationMessage = errorMessage ?? "An unknown error occurred."
             }
@@ -73,7 +81,8 @@ struct RegisterScreen: View {
 }
 
 struct RegisterScreen_Previews: PreviewProvider {
+    @State static var isLoggedIn: Bool = false
     static var previews: some View {
-        RegisterScreen()
+        RegisterScreen(isLoggedIn: $isLoggedIn)
     }
 }

@@ -7,11 +7,20 @@
 
 import SwiftUI
 
+@main
 struct iOS_Recipe_UI_ProjectApp: App {
+    @State private var isLoggedIn: Bool = false
+    
     var body: some Scene {
         WindowGroup {
-            RecipeListScreen()
+            if isLoggedIn {
+                RecipeListScreen() 
+            } else {
+                RegisterScreen(isLoggedIn: $isLoggedIn)
+            }
         }
     }
 }
+
+
 

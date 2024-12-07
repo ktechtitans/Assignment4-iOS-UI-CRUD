@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct AddEditRecipeScreen: View {
-    @Binding var recipe: Recipe? // Binding to allow editing from parent view
+    @Binding var recipe: Recipe?
     @State private var title: String
     @State private var cuisine: String
     @State private var rating: Double
-    var onSave: (Recipe) -> Void // Closure for saving the recipe
+    var onSave: (Recipe) -> Void
 
     // Initializer
     init(recipe: Binding<Recipe?>, onSave: @escaping (Recipe) -> Void) {
@@ -36,12 +36,12 @@ struct AddEditRecipeScreen: View {
 
             Button(action: {
                 let updatedRecipe = Recipe(
-                    _id: recipe?.id ?? UUID().uuidString,
+                    id: recipe?.id ?? UUID().uuidString,
                     recipeName: title,
                     cuisine: cuisine,
                     averageRating: rating
                 )
-                onSave(updatedRecipe) // Trigger save action
+                onSave(updatedRecipe)
             }) {
                 Text(recipe == nil ? "Add Recipe" : "Save Changes")
                     .frame(maxWidth: .infinity)
@@ -62,7 +62,7 @@ struct AddEditRecipeScreen_Previews: PreviewProvider {
             AddEditRecipeScreen(
                 recipe: .constant(nil),
                 onSave: { _ in
-                    print("Recipe saved in preview.") // Example action
+                    print("Recipe saved in preview.") 
                 }
             )
         }
