@@ -7,9 +7,16 @@
 
 import Foundation
 
-struct Recipe: Identifiable {
-    var id: UUID = UUID()  // Unique identifier for each recipe
-    var title: String      // Title of the recipe
-    var studio: String     // Studio or creator of the recipe
-    var rating: Int        // Rating of the recipe (can be an integer, e.g., 1-5)
+struct Recipe: Identifiable, Codable {
+    var id: String {
+        return _id
+    }
+    
+    let _id: String
+    let recipeName: String
+    let cuisine: String
+    let averageRating: Double
 }
+
+
+

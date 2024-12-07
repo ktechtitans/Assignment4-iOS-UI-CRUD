@@ -8,86 +8,92 @@
 import Foundation
 
 struct APIService {
-    // Update baseURL to the correct API URL
-    static let baseURL = "https://assignment-4-jwt.onrender.com" // Updated to your correct Render URL
+    static let baseURL = "https://assignment-4-jwt.onrender.com"
 
-    // Login method
-    static func login(username: String, password: String, completion: @escaping (Bool, String?) -> Void) {
-        let url = URL(string: "\(baseURL)/login")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let body = ["username": username, "password": password]
-        
-        // Convert the body to JSON data
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
-
-        // Data task to handle login
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            // Error handling for network errors
+    // Fetch Recipes
+    static func fetchRecipes(completion: @escaping ([Recipe]?, String?) -> Void) {
+        let url = URL(string: "\(baseURL)/recipes")!
+        let task = URLSession.shared.dataTask(with: url) { data, _, error in
             if let error = error {
-                completion(false, error.localizedDescription)
-                return
-            }
-
-            // Handle successful response
-            guard let data = data else {
-                completion(false, "No data received")
+                completion(nil, error.localizedDescription)
                 return
             }
             
-            // Try to decode JSON response to get the login result
+            guard let data = data else {
+                completion(nil, "No data received")
+                return
+            }
+            
             do {
-                if let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let message = responseDict["message"] as? String, message == "Login successful" {
-                    completion(true, nil)
-                } else {
-                    completion(false, "Invalid username or password.")
-                }
+                let decoder = JSONDecoder()
+                let recipes = try decoder.decode([Recipe].self, from: data)
+                completion(recipes, nil)
             } catch {
-                completion(false, "Failed to parse response.")
+                completion(nil, "Failed to decode response: \(error.localizedDescription)")
             }
         }
         task.resume()
     }
 
-    // Register method
-    static func register(email: String, password: String, completion: @escaping (Bool, String?) -> Void) {
-        let url = URL(string: "\(baseURL)/register")!
+    // User Login
+    static func login(username: String, password: String, completion: @escaping (Bool, String?) -> Void) {
+        guard let url = URL(string: "\(baseURL)/login") else {
+            completion(false, "Invalid URL")
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        // Send email and password in the request body
-        let body = ["email": email, "password": password]
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = ["username": username, "password": password]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
 
-        // Data task to handle registration
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            // Error handling for network errors
             if let error = error {
                 completion(false, error.localizedDescription)
                 return
             }
 
-            // Handle successful response
-            guard let data = data else {
-                completion(false, "No data received")
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                completion(false, "Invalid response from server")
                 return
             }
 
-            // Try to decode JSON response to get registration result
-            do {
-                if let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let message = responseDict["message"] as? String, message == "User registered successfully" {
-                    completion(true, nil)
-                } else {
-                    completion(false, "Registration failed. Try again.")
-                }
-            } catch {
-                completion(false, "Failed to parse response.")
+            completion(true, nil)
+        }
+        task.resume()
+    }
+
+    // User Registration
+    static func register(email: String, password: String, completion: @escaping (Bool, String?) -> Void) {
+        guard let url = URL(string: "\(baseURL)/register") else {
+            completion(false, "Invalid URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = ["email": email, "password": password]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(false, error.localizedDescription)
+                return
             }
+
+            guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+                completion(false, "Invalid response from server")
+                return
+            }
+
+            completion(true, nil)
         }
         task.resume()
     }
 }
+
+

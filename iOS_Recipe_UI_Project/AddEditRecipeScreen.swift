@@ -7,63 +7,65 @@
 
 import SwiftUI
 
-struct AddEditRecipeView: View {
-    @State private var title: String = ""
-    @State private var studio: String = ""
-    @State private var rating: String = ""
-    @State private var isEditMode = false
-    @State private var recipe: Recipe?
+struct AddEditRecipeScreen: View {
+    @Binding var recipe: Recipe? // Binding to allow editing from parent view
+    @State private var title: String
+    @State private var cuisine: String
+    @State private var rating: Double
+    var onSave: (Recipe) -> Void // Closure for saving the recipe
+
+    // Initializer
+    init(recipe: Binding<Recipe?>, onSave: @escaping (Recipe) -> Void) {
+        _recipe = recipe
+        _title = State(initialValue: recipe.wrappedValue?.recipeName ?? "")
+        _cuisine = State(initialValue: recipe.wrappedValue?.cuisine ?? "")
+        _rating = State(initialValue: recipe.wrappedValue?.averageRating ?? 0.0)
+        self.onSave = onSave
+    }
 
     var body: some View {
         Form {
-            TextField("Recipe Title", text: $title)
-                .padding()
-                .border(Color.gray)
-
-            TextField("Studio", text: $studio)
-                .padding()
-                .border(Color.gray)
-
-            // Ensure that keyboardType is only applied to the correct TextField
-            TextField("Rating", text: $rating)
-                .padding()
-                .border(Color.gray)
-               
-
-            Button(action: saveRecipe) {
-                Text(isEditMode ? "Save Changes" : "Add Recipe")
-                    .padding()
-                    .background(Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+            Section(header: Text("Recipe Details")) {
+                TextField("Recipe Name", text: $title)
+                TextField("Cuisine", text: $cuisine)
+                HStack {
+                    Text("Rating: \(String(format: "%.1f", rating))")
+                    Slider(value: $rating, in: 0...5, step: 0.1)
+                }
             }
 
             Button(action: {
-                // Dismiss and go back to the Recipe List Screen
+                let updatedRecipe = Recipe(
+                    _id: recipe?.id ?? UUID().uuidString,
+                    recipeName: title,
+                    cuisine: cuisine,
+                    averageRating: rating
+                )
+                onSave(updatedRecipe) // Trigger save action
             }) {
-                Text("Cancel")
-                    .foregroundColor(.red)
+                Text(recipe == nil ? "Add Recipe" : "Save Changes")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(Color.blue)
+                    .cornerRadius(8)
             }
         }
-       
-        .onAppear {
-            if let recipe = recipe {
-                isEditMode = true
-                title = recipe.title
-                studio = recipe.studio
-                rating = "\(recipe.rating)"
-            }
-        }
-    }
-
-    func saveRecipe() {
-        // Handle Add/Edit logic based on isEditMode
-        // If editing, update the recipe, else create a new recipe
+        .navigationTitle(recipe == nil ? "Add Recipe" : "Edit Recipe")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-struct AddEditRecipeView_Previews: PreviewProvider {
+struct AddEditRecipeScreen_Previews: PreviewProvider {
     static var previews: some View {
-        AddEditRecipeView()
+        NavigationView {
+            AddEditRecipeScreen(
+                recipe: .constant(nil),
+                onSave: { _ in
+                    print("Recipe saved in preview.") // Example action
+                }
+            )
+        }
     }
 }
+
